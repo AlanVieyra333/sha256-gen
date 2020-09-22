@@ -12,7 +12,7 @@ void padding(uint8_t out[]) {
   out[126] = 2;
 }
 
-void print_state() {
+void print_state(uint32_t state[8]) {
   
 }
 
