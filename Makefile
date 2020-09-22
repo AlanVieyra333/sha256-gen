@@ -1,5 +1,5 @@
-PROJ = find-sha
-MAIN = main.c
+PROJ = find-sha256-brute-force
+MAIN = find-sha256-brute-force.c
 OBJS = lib/sha256.o lib/utils.o
 CFLAGS = -std=c99 -O3
 LFLAGS = -Ilib
