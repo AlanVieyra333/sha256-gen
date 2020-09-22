@@ -76,7 +76,7 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
       a = T1 + T2;
     }
 
-    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, data[4], K256
+    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
     for (; i < 64; i++) {
       s0 = sigma0(W[(i + 1) & 0x0f]);
       s1 = sigma1(W[(i + 14) & 0x0f]);
