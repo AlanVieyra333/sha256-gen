@@ -5,12 +5,13 @@
 /* gcc -DTEST_MAIN -std=c99 sha256.c -o sha256.exe  */
 
 #include "sha256.h"
+#include "utils.h"
 
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
-static const uint32_t K256[] = {
+static const uint32_t K256[64] = {
     0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1,
     0x923F82A4, 0xAB1C5ED5, 0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
     0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174, 0xE49B69C1, 0xEFBE4786,
@@ -36,24 +37,12 @@ static const uint32_t K256[] = {
 /* https://stackoverflow.com/q/29538935/608639 */
 uint32_t B2U32(uint8_t val, uint8_t sh) { return ((uint32_t)val) << sh; }
 
-void print_state(uint32_t state[8]) {
-  uint8_t hash[32];
-
-  for (uint8_t i = 0; i < 8; i++) {
-    hash[i * 4 + 0] = (uint8_t)(state[i] >> 24);
-    hash[i * 4 + 1] = (uint8_t)(state[i] >> 16);
-    hash[i * 4 + 2] = (uint8_t)(state[i] >> 8);
-    hash[i * 4 + 3] = (uint8_t)(state[i] >> 0);
-  }
-
-  printf("SHA256 hash: %s\n", bytes_to_hex(hash_result, 32));
-}
-
 /* Process multiple blocks. The caller is responsible for setting the initial */
 /*  state, and the caller is responsible for padding the final block.        */
-void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
-  uint32_t a, b, c, d, e, f, g, h, s0, s1, T1, T2;
-  uint32_t X[16], i;
+void sha256_process(uint32_t state[8], const uint8_t data[64], uint32_t length) {
+  uint32_t a, b, c, d, e, f, g, h;
+  uint32_t W[16];
+  uint32_t s0, s1, T1, T2, i;
 
   size_t blocks = length / 64;
   while (blocks--) {
@@ -66,19 +55,14 @@ void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
     g = state[6];
     h = state[7];
 
+    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, data[4], K256
     for (i = 0; i < 16; i++) {
-      X[i] = B2U32(data[0], 24) | B2U32(data[1], 16) | B2U32(data[2], 8) |
+      W[i] = B2U32(data[0], 24) | B2U32(data[1], 16) | B2U32(data[2], 8) |
              B2U32(data[3], 0);
       data += 4;
 
-      T1 = h;
-      T1 += Sigma1(e);
-      T1 += Ch(e, f, g);
-      T1 += K256[i];
-      T1 += X[i];
-
-      T2 = Sigma0(a);
-      T2 += Maj(a, b, c);
+      T1 = h + Sigma1(e) + Ch(e, f, g) + K256[i] + W[i];
+      T2 = Sigma0(a) + Maj(a, b, c);
 
       h = g;
       g = f;
@@ -91,14 +75,15 @@ void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
     }
 
     for (; i < 64; i++) {
-      s0 = X[(i + 1) & 0x0f];
+      s0 = W[(i + 1) & 0x0f];
       s0 = sigma0(s0);
-      s1 = X[(i + 14) & 0x0f];
+      s1 = W[(i + 14) & 0x0f];
       s1 = sigma1(s1);
 
-      T1 = X[i & 0xf] += s0 + s1 + X[(i + 9) & 0xf];
+      T1 = W[i & 0xf] += s0 + s1 + W[(i + 9) & 0xf];
       T1 += h + Sigma1(e) + Ch(e, f, g) + K256[i];
       T2 = Sigma0(a) + Maj(a, b, c);
+
       h = g;
       g = f;
       f = e;

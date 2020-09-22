@@ -27,7 +27,7 @@ char* bytes_to_hex(uint8_t bytes[], size_t len) {
     sprintf(&hex[2 * i], "%02x", bytes[i]);
   }
 
-  hex[2 * len + 1] = 0;
+  hex[2 * len] = 0;
 
   return hex;
 }
@@ -44,4 +44,17 @@ void sha256_padding(uint8_t in[], size_t len, uint8_t out[]) {
   for (uint8_t i = 0; i < 8; i++) {
     out[padded_len - (i + 1)] = l >> (8 * i);
   }
+}
+
+void print_state(uint32_t state[8]) {
+  uint8_t hash[32];
+
+  for (uint8_t i = 0; i < 8; i++) {
+    hash[i * 4 + 0] = (uint8_t)(state[i] >> 24);
+    hash[i * 4 + 1] = (uint8_t)(state[i] >> 16);
+    hash[i * 4 + 2] = (uint8_t)(state[i] >> 8);
+    hash[i * 4 + 3] = (uint8_t)(state[i] >> 0);
+  }
+
+  printf("SHA256 hash: %s\n", bytes_to_hex(hash, 32));
 }
