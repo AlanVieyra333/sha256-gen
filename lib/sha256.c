@@ -5,11 +5,12 @@
 /* gcc -DTEST_MAIN -std=c99 sha256.c -o sha256.exe  */
 
 #include "sha256.h"
-#include "utils.h"
 
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "utils.h"
 
 static const uint32_t K256[64] = {
     0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1,
@@ -39,7 +40,8 @@ uint32_t B2U32(uint8_t val, uint8_t sh) { return ((uint32_t)val) << sh; }
 
 /* Process multiple blocks. The caller is responsible for setting the initial */
 /*  state, and the caller is responsible for padding the final block.        */
-void sha256_process(uint32_t state[8], const uint8_t data[64], uint32_t length) {
+void sha256_process(uint32_t state[8], const uint8_t data[64],
+                    uint32_t length) {
   uint32_t a, b, c, d, e, f, g, h;
   uint32_t W[16];
   uint32_t s0, s1, T1, T2, i;
@@ -55,7 +57,7 @@ void sha256_process(uint32_t state[8], const uint8_t data[64], uint32_t length) 
     g = state[6];
     h = state[7];
 
-    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, data[4], K256
+    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
     for (i = 0; i < 16; i++) {
       W[i] = B2U32(data[0], 24) | B2U32(data[1], 16) | B2U32(data[2], 8) |
              B2U32(data[3], 0);
@@ -74,13 +76,12 @@ void sha256_process(uint32_t state[8], const uint8_t data[64], uint32_t length) 
       a = T1 + T2;
     }
 
+    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, data[4], K256
     for (; i < 64; i++) {
-      s0 = W[(i + 1) & 0x0f];
-      s0 = sigma0(s0);
-      s1 = W[(i + 14) & 0x0f];
-      s1 = sigma1(s1);
+      s0 = sigma0(W[(i + 1) & 0x0f]);
+      s1 = sigma1(W[(i + 14) & 0x0f]);
 
-      T1 = W[i & 0xf] += s0 + s1 + W[(i + 9) & 0xf];
+      T1 = W[i & 0xf] + s0 + s1 + W[(i + 9) & 0xf];
       T1 += h + Sigma1(e) + Ch(e, f, g) + K256[i];
       T2 = Sigma0(a) + Maj(a, b, c);
 
