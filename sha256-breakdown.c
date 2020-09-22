@@ -13,10 +13,19 @@ void padding(uint8_t out[]) {
 }
 
 void print_state(uint32_t state[8]) {
-  
+  uint8_t hash[32];
+
+  for (uint8_t i = 0; i < 8; i++) {
+    hash[i * 4 + 0] = (uint8_t)(state[i] >> 24);
+    hash[i * 4 + 1] = (uint8_t)(state[i] >> 16);
+    hash[i * 4 + 2] = (uint8_t)(state[i] >> 8);
+    hash[i * 4 + 3] = (uint8_t)(state[i] >> 0);
+  }
+
+  printf("SHA256 hash: %s\n", bytes_to_hex(hash_result, 32));
 }
 
-char* hash_msg(uint8_t message[128], uint8_t hash[32]) {
+void hash_msg(uint8_t message[128], uint8_t hash[32]) {
   /* initial state */
   uint32_t state[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
                        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
@@ -40,8 +49,7 @@ void breakdown(const char message[64]) {
 
   hash_msg(msg_padded, hash_result);
 
-  printf("SHA256 hash: %02X%02X%02X...%02X%02X%02X\n", hash_result[0], hash_result[1],
-            hash_result[2], hash_result[29], hash_result[30], hash_result[31]);
+  printf("SHA256 hash: %s\n", bytes_to_hex(hash_result, 32));
 }
 
 int main(int argc, char* argv[]) {

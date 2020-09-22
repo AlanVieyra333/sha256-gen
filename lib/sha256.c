@@ -36,6 +36,19 @@ static const uint32_t K256[] = {
 /* https://stackoverflow.com/q/29538935/608639 */
 uint32_t B2U32(uint8_t val, uint8_t sh) { return ((uint32_t)val) << sh; }
 
+void print_state(uint32_t state[8]) {
+  uint8_t hash[32];
+
+  for (uint8_t i = 0; i < 8; i++) {
+    hash[i * 4 + 0] = (uint8_t)(state[i] >> 24);
+    hash[i * 4 + 1] = (uint8_t)(state[i] >> 16);
+    hash[i * 4 + 2] = (uint8_t)(state[i] >> 8);
+    hash[i * 4 + 3] = (uint8_t)(state[i] >> 0);
+  }
+
+  printf("SHA256 hash: %s\n", bytes_to_hex(hash_result, 32));
+}
+
 /* Process multiple blocks. The caller is responsible for setting the initial */
 /*  state, and the caller is responsible for padding the final block.        */
 void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
