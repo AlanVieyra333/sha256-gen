@@ -36,7 +36,7 @@ void breakdown(const char message[64]) {
 
   hash_msg(msg_padded, hash_result);
 
-  printf("SHA256 hash: %s\n", bytes_to_hex(hash_result, 32));
+  //printf("SHA256 hash: %s\n", bytes_to_hex(hash_result, 32));
 }
 
 int main(int argc, char* argv[]) {

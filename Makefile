@@ -14,8 +14,22 @@ $(PROJ): $(MAIN) $(OBJS)
 $(OBJS): %.o: %.c
 	$(CC) $(CFLAGS) -c -Wall -o $@ $<
 
-run: $(PROJ)
+build: $(PROJ) gen_in_msg.a
+
+gen_in_msg.a: gen_in_msg.c
+	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $^
+
+
+model: data.csv hash_round_predict.py
+	python hash_round_predict.py
+
+data.csv: $(PROJ) gen_in_msg.a gen_data.sh
+	./gen_data.sh
+
+test: $(PROJ)
 	./$(PROJ) $(MESSAGE)
 
 clean:
 	rm -rf $(PROJ) *.o **/*.o
+
+.PHONY: model test clean

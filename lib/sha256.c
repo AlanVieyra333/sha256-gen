@@ -60,7 +60,6 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
   uint32_t a, b, c, d, e, f, g, h;
   uint32_t W[16], Wi;
   uint32_t s0, s1, i;
-  uint32_t state_tmp[8];
 
   size_t blocks = length / 64;
   while (blocks--) {
@@ -79,7 +78,9 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
              B2U32(data[3], 0);
       data += 4;
 
+      printf("%u,%u,%u,%u,%u,%u,%u,%u,%u,%u", a, b, c, d, e, f, g, h, W[i], K256[i]);
       hash_round(&a, &b, &c, &d, &e, &f, &g, &h, W[i], K256[i]);
+      printf(",%u,%u,%u,%u,%u,%u,%u,%u\n", a, b, c, d, e, f, g, h);
     }
 
     // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
@@ -88,16 +89,9 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
       s1 = sigma1(W[(i + 14) & 0x0f]);
       Wi = W[i & 0xf] += s0 + s1 + W[(i + 9) & 0xf];
 
+      printf("%u,%u,%u,%u,%u,%u,%u,%u,%u,%u", a, b, c, d, e, f, g, h, W[i], K256[i]);
       hash_round(&a, &b, &c, &d, &e, &f, &g, &h, Wi, K256[i]);
-      
-      state[0] += a;
-      state[1] += b;
-      state[2] += c;
-      state[3] += d;
-      state[4] += e;
-      state[5] += f;
-      state[6] += g;
-      state[7] += h;
+      printf(",%u,%u,%u,%u,%u,%u,%u,%u\n", a, b, c, d, e, f, g, h);
     }
 
     state[0] += a;
