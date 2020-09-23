@@ -38,13 +38,29 @@ static const uint32_t K256[64] = {
 /* https://stackoverflow.com/q/29538935/608639 */
 uint32_t B2U32(uint8_t val, uint8_t sh) { return ((uint32_t)val) << sh; }
 
+void hash_round(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d, uint32_t *e,
+                uint32_t *f, uint32_t *g, uint32_t *h, uint32_t W, uint32_t K) {
+  uint32_t T1 = Sigma1(*e) + Ch(*e, *f, *g) + *h + K + W;
+  uint32_t T2 = Sigma0(*a) + Maj(*a, *b, *c);
+
+  *h = *g;
+  *g = *f;
+  *f = *e;
+  *e = *d + T1;
+  *d = *c;
+  *c = *b;
+  *b = *a;
+  *a = T1 + T2;
+}
+
 /* Process multiple blocks. The caller is responsible for setting the initial */
 /*  state, and the caller is responsible for padding the final block.        */
 void sha256_process(uint32_t state[8], const uint8_t data[64],
                     uint32_t length) {
   uint32_t a, b, c, d, e, f, g, h;
-  uint32_t W[16];
-  uint32_t s0, s1, T1, T2, i;
+  uint32_t W[16], Wi;
+  uint32_t s0, s1, i;
+  uint32_t state_tmp[8];
 
   size_t blocks = length / 64;
   while (blocks--) {
@@ -63,36 +79,25 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
              B2U32(data[3], 0);
       data += 4;
 
-      T1 = h + Sigma1(e) + Ch(e, f, g) + K256[i] + W[i];
-      T2 = Sigma0(a) + Maj(a, b, c);
-
-      h = g;
-      g = f;
-      f = e;
-      e = d + T1;
-      d = c;
-      c = b;
-      b = a;
-      a = T1 + T2;
+      hash_round(&a, &b, &c, &d, &e, &f, &g, &h, W[i], K256[i]);
     }
 
     // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
     for (; i < 64; i++) {
       s0 = sigma0(W[(i + 1) & 0x0f]);
       s1 = sigma1(W[(i + 14) & 0x0f]);
+      Wi = W[i & 0xf] += s0 + s1 + W[(i + 9) & 0xf];
 
-      T1 = W[i & 0xf] + s0 + s1 + W[(i + 9) & 0xf];
-      T1 += h + Sigma1(e) + Ch(e, f, g) + K256[i];
-      T2 = Sigma0(a) + Maj(a, b, c);
-
-      h = g;
-      g = f;
-      f = e;
-      e = d + T1;
-      d = c;
-      c = b;
-      b = a;
-      a = T1 + T2;
+      hash_round(&a, &b, &c, &d, &e, &f, &g, &h, Wi, K256[i]);
+      
+      state[0] += a;
+      state[1] += b;
+      state[2] += c;
+      state[3] += d;
+      state[4] += e;
+      state[5] += f;
+      state[6] += g;
+      state[7] += h;
     }
 
     state[0] += a;
@@ -110,7 +115,7 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
 
 #include <stdio.h>
 #include <string.h>
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   /* empty message with padding */
   uint8_t message[64];
   memset(message, 0x00, sizeof(message));
