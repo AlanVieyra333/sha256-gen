@@ -25,15 +25,6 @@ static const uint32_t K256[64] = {
     0x5B9CCA4F, 0x682E6FF3, 0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208,
     0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2};
 
-#define ROTATE(x, y) (((x) >> (y)) | ((x) << (32 - (y))))
-#define Sigma0(x) (ROTATE((x), 2) ^ ROTATE((x), 13) ^ ROTATE((x), 22))
-#define Sigma1(x) (ROTATE((x), 6) ^ ROTATE((x), 11) ^ ROTATE((x), 25))
-#define sigma0(x) (ROTATE((x), 7) ^ ROTATE((x), 18) ^ ((x) >> 3))
-#define sigma1(x) (ROTATE((x), 17) ^ ROTATE((x), 19) ^ ((x) >> 10))
-
-#define Ch(x, y, z) (((x) & (y)) ^ ((~(x)) & (z)))
-#define Maj(x, y, z) (((x) & (y)) ^ ((x) & (z)) ^ ((y) & (z)))
-
 /* Avoid undefined behavior                    */
 /* https://stackoverflow.com/q/29538935/608639 */
 uint32_t B2U32(uint8_t val, uint8_t sh) { return ((uint32_t)val) << sh; }
