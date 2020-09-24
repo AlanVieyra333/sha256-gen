@@ -1,5 +1,6 @@
 # 200 input hashes ; 10|20|15|8 ; Adam(learning_rate=0.001) ; 100 epochs -> accuracy: 0.9055 ; rmse: 0.0180269
 # 200 input hashes ; 10|20|15|10|8 ; Adam(learning_rate=0.00105) ; 100 epochs -> accuracy: 0.9213 ; rmse: 0.0232368
+# 200 input hashes ; 10|20|15|10|8 ; Adam(learning_rate=0.0011) ; 1000 epochs -> accuracy: 0.9665 ; rmse: 0.0138343 
 import math
 import pandas_datareader.data as web
 import numpy as np
@@ -38,14 +39,14 @@ model.add(Dense(15, activation='sigmoid'))
 model.add(Dense(10, activation='sigmoid'))
 model.add(Dense(8))
 
-opt = tf.keras.optimizers.Adam(learning_rate=0.00105)
+opt = tf.keras.optimizers.Adam(learning_rate=0.0011)
 
 # Compile the model
 model.compile(optimizer=opt, loss='mean_squared_error',
               metrics=['accuracy'])
 
 # Train the model
-model.fit(x_train, y_train, batch_size=1, epochs=100)
+model.fit(x_train, y_train, batch_size=1, epochs=1000)
 
 y_pred = model.predict(x_test)
 # print(y_pred)
