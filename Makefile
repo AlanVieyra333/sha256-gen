@@ -1,7 +1,7 @@
-PROJ = sha256-breakdown.a
-MAIN = sha256-breakdown.c
+PROJ = sha256
+MAIN = main.c
 OBJS = lib/sha256.o lib/utils.o
-APPS = gen_in_msg.a reverse_func.a
+APPS = sha256-breakdown.a gen_in_msg.a reverse_func.a
 CFLAGS = -std=c99 -O3
 LFLAGS = -Ilib
 CC = gcc
@@ -17,7 +17,7 @@ $(PROJ): $(MAIN) $(OBJS)
 $(OBJS): %.o: %.c
 	$(CC) $(CFLAGS) -c -Wall -o $@ $<
 
-$(APPS): %.a: %.c
+$(APPS): %.a: %.c $(OBJS)
 	$(CC) $(CFLAGS) $(LFLAGS) -o $@ $^
 
 model: data.csv hash_round_predict.py
@@ -30,6 +30,6 @@ test: $(PROJ)
 	./$(PROJ) $(MESSAGE)
 
 clean:
-	rm -rf $(PROJ) *.o **/*.o
+	rm -rf $(PROJ) *.a *.o **/*.o
 
 .PHONY: all model test clean

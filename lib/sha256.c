@@ -44,10 +44,34 @@ void hash_round(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d, uint32_t *e,
   *a = T1 + T2;
 }
 
+// Print 16 + 8 + 64 = 88 uint values
+void print_vars(uint32_t W[16], uint32_t state[8], uint32_t K[64]) {
+  for (size_t i = 0; i < 16; i++) {
+    printf("%u,", W[i]);
+  }
+  for (size_t i = 0; i < 8; i++) {
+    printf("%u,", state[i]);
+  }
+  for (size_t i = 0; i < 64; i++) {
+    printf("%u,", K[i]);
+  }
+}
+
+void print_st(uint32_t state[8]) {
+  for (size_t i = 0; i < 8; i++) {
+    printf("%u", state[i]);
+
+    if (i < 7) {
+      printf(",");
+    } else {
+      printf("\n");
+    }
+  }
+}
+
 /* Process multiple blocks. The caller is responsible for setting the initial */
 /*  state, and the caller is responsible for padding the final block.        */
-void sha256_process(uint32_t state[8], const uint8_t data[64],
-                    uint32_t length) {
+void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
   uint32_t a, b, c, d, e, f, g, h;
   uint32_t W[16], Wi;
   uint32_t s0, s1, i;
@@ -63,26 +87,29 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
     g = state[6];
     h = state[7];
 
-    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
+    // Create W matrix with the input data block (64 bytes).
     for (i = 0; i < 16; i++) {
       W[i] = B2U32(data[0], 24) | B2U32(data[1], 16) | B2U32(data[2], 8) |
              B2U32(data[3], 0);
       data += 4;
-
-      printf("%u,%u,%u,%u,%u,%u,%u,%u,%u,%u", a, b, c, d, e, f, g, h, W[i], K256[i]);
-      hash_round(&a, &b, &c, &d, &e, &f, &g, &h, W[i], K256[i]);
-      printf(",%u,%u,%u,%u,%u,%u,%u,%u\n", a, b, c, d, e, f, g, h);
     }
 
-    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
-    for (; i < 64; i++) {
-      s0 = sigma0(W[(i + 1) & 0x0f]);
-      s1 = sigma1(W[(i + 14) & 0x0f]);
-      Wi = W[i & 0xf] += s0 + s1 + W[(i + 9) & 0xf];
+    print_vars(W, state, K256);
 
-      printf("%u,%u,%u,%u,%u,%u,%u,%u,%u,%u", a, b, c, d, e, f, g, h, W[i], K256[i]);
+    // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
+    for (i = 0; i < 64; i++) {
+      if (i < 16) {
+        Wi = W[i];
+      } else {
+        s0 = sigma0(W[(i + 1) & 0x0f]);
+        s1 = sigma1(W[(i + 14) & 0x0f]);
+        Wi = W[i & 0xf] += s0 + s1 + W[(i + 9) & 0xf];
+      }
+
+      // printf("%u,%u,%u,%u,%u,%u,%u,%u,%u,%u", a, b, c, d, e, f, g, h, Wi,
+      //        K256[i]);
       hash_round(&a, &b, &c, &d, &e, &f, &g, &h, Wi, K256[i]);
-      printf(",%u,%u,%u,%u,%u,%u,%u,%u\n", a, b, c, d, e, f, g, h);
+      // printf(",%u,%u,%u,%u,%u,%u,%u,%u\n", a, b, c, d, e, f, g, h);
     }
 
     state[0] += a;
@@ -93,6 +120,8 @@ void sha256_process(uint32_t state[8], const uint8_t data[64],
     state[5] += f;
     state[6] += g;
     state[7] += h;
+
+    print_st(state);
   }
 }
 
