@@ -1,6 +1,8 @@
 # 200 input hashes ; 10|20|15|8 ; Adam(learning_rate=0.001) ; 100 epochs -> accuracy: 0.9055 ; rmse: 0.0180269
 # 200 input hashes ; 10|20|15|10|8 ; Adam(learning_rate=0.00105) ; 100 epochs -> accuracy: 0.9213 ; rmse: 0.0232368
 # 200 input hashes ; 10|20|15|10|8 ; Adam(learning_rate=0.0011) ; 1000 epochs -> accuracy: 0.9665 ; rmse: 0.0138343 
+# 200 input hashes ; 10|15|20|15|10|8 ; Adam(learning_rate=0.0011) ; 1000 epochs -> accuracy: 0.9709 ; rmse: 0.0091305
+# 200 input hashes ; 10|13|16|20|17|14|11|8 ; Adam(learning_rate=0.0011) ; 1000 epochs -> accuracy: 0.9747 ; rmse: 0.0099129
 import math
 import pandas_datareader.data as web
 import numpy as np
@@ -34,9 +36,12 @@ y_test = y[training_data_len:]
 
 # Build model
 model = Sequential()
-model.add(Dense(20, input_dim=10, activation='sigmoid'))
-model.add(Dense(15, activation='sigmoid'))
-model.add(Dense(10, activation='sigmoid'))
+model.add(Dense(13, input_dim=10, activation='sigmoid'))
+model.add(Dense(16, activation='sigmoid'))
+model.add(Dense(20, activation='sigmoid'))
+model.add(Dense(17, activation='sigmoid'))
+model.add(Dense(14, activation='sigmoid'))
+model.add(Dense(11, activation='sigmoid'))
 model.add(Dense(8))
 
 opt = tf.keras.optimizers.Adam(learning_rate=0.0011)

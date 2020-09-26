@@ -44,16 +44,13 @@ void hash_round(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d, uint32_t *e,
   *a = T1 + T2;
 }
 
-// Print 16 + 8 + 64 = 88 uint values
-void print_vars(uint32_t W[16], uint32_t state[8], uint32_t K[64]) {
+// Print 16 + 8 = 24 uint values
+void print_vars(uint32_t W[16], uint32_t state[8]) {
   for (size_t i = 0; i < 16; i++) {
     printf("%u,", W[i]);
   }
   for (size_t i = 0; i < 8; i++) {
     printf("%u,", state[i]);
-  }
-  for (size_t i = 0; i < 64; i++) {
-    printf("%u,", K[i]);
   }
 }
 
@@ -94,7 +91,7 @@ void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
       data += 4;
     }
 
-    print_vars(W, state, K256);
+    print_vars(W, state);
 
     // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
     for (i = 0; i < 64; i++) {

@@ -1,3 +1,8 @@
+# accuracy: 0.9624, rmse: 0.36074939 ; 88|476|8, epochs=30,learning_rate=0.001
+# accuracy: 0.9785, rmse: 0.54449450 ; 24|48|8, epochs=30,learning_rate=0.001
+# accuracy: 0.9833, rmse: 0.39933591 ; 24|35|48|35|15|8, epochs=30,learning_rate=0.001
+# accuracy: 0.8292, rmse: 0.45744228 ; 24|35|48|100|48|35|15|8, epochs=100,learning_rate=0.001
+# accuracy: 0.9836, rmse: 0.43026822 ; 24|30|50|50|25|8, epochs=100,learning_rate=0.001
 import math
 import pandas_datareader.data as web
 import numpy as np
@@ -17,11 +22,12 @@ tf.random.set_seed(9950866220)
 
 # Input 10 features, output 8 targets
 data = np.genfromtxt('data.csv', delimiter=',')
+features = 24
 scaled_data = data / 4294967295  # 2^32 - 1
 training_data_len = math.ceil(len(scaled_data) * 0.8)
 
-x = scaled_data[:, :88]
-y = scaled_data[:, 88:]
+x = scaled_data[:, :features]
+y = scaled_data[:, features:]
 
 x_train = x[:training_data_len]
 y_train = y[:training_data_len]
@@ -31,26 +37,20 @@ y_test = y[training_data_len:]
 
 # Build model
 model = Sequential()
-model.add(Dense(110, input_dim=88, activation='sigmoid'))
-model.add(Dense(130, activation='sigmoid'))
-model.add(Dense(150, activation='sigmoid'))
-model.add(Dense(176, activation='sigmoid'))
-model.add(Dense(150, activation='sigmoid'))
-model.add(Dense(120, activation='sigmoid'))
-model.add(Dense(100, activation='sigmoid'))
-model.add(Dense(80, activation='sigmoid'))
+model.add(Dense(35, input_dim=features, activation='sigmoid'))
 model.add(Dense(50, activation='sigmoid'))
-model.add(Dense(20, activation='sigmoid'))
+model.add(Dense(50, activation='sigmoid'))
+model.add(Dense(25, activation='sigmoid'))
 model.add(Dense(8))
 
-opt = tf.keras.optimizers.Adam(learning_rate=0.0011)
+opt = tf.keras.optimizers.Adam(learning_rate=0.001)
 
 # Compile the model
 model.compile(optimizer=opt, loss='mean_squared_error',
               metrics=['accuracy'])
 
 # Train the model
-model.fit(x_train, y_train, batch_size=1, epochs=30)
+model.fit(x_train, y_train, batch_size=1, epochs=100)
 
 y_pred = model.predict(x_test)
 # print(y_pred)

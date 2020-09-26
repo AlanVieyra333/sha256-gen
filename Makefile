@@ -23,6 +23,9 @@ $(APPS): %.a: %.c $(OBJS)
 model: data.csv hash_round_predict.py
 	python hash_round_predict.py
 
+model2: data.csv hash_predict.py
+	python hash_predict.py
+
 data.csv: $(PROJ) gen_in_msg.a gen_data.sh
 	./gen_data.sh
 
