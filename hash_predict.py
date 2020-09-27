@@ -1,8 +1,10 @@
 # accuracy: 0.9624, rmse: 0.36074939 ; 88|476|8, epochs=30,learning_rate=0.001
-# accuracy: 0.9785, rmse: 0.54449450 ; 24|48|8, epochs=30,learning_rate=0.001
+# accuracy: 0.9880, rmse: 0.42458802 ; 24|450|8, epochs=30,learning_rate=0.001
 # accuracy: 0.9833, rmse: 0.39933591 ; 24|35|48|35|15|8, epochs=30,learning_rate=0.001
-# accuracy: 0.8292, rmse: 0.45744228 ; 24|35|48|100|48|35|15|8, epochs=100,learning_rate=0.001
 # accuracy: 0.9836, rmse: 0.43026822 ; 24|30|50|50|25|8, epochs=100,learning_rate=0.001
+# accuracy: 0.9785, rmse: 0.54449450 ; 24|48|8, epochs=30,learning_rate=0.001
+# accuracy: 0.9540, rmse: 0.44320928 ; 24|500|300|8, epochs=100,learning_rate=0.001
+# accuracy: 0.8292, rmse: 0.45744228 ; 24|35|48|100|48|35|15|8, epochs=100,learning_rate=0.001
 import math
 import pandas_datareader.data as web
 import numpy as np
@@ -20,7 +22,7 @@ import sys
 
 tf.random.set_seed(9950866220)
 
-# Input 10 features, output 8 targets
+# Input 24 features, output 8 targets
 data = np.genfromtxt('data.csv', delimiter=',')
 features = 24
 scaled_data = data / 4294967295  # 2^32 - 1
@@ -37,10 +39,8 @@ y_test = y[training_data_len:]
 
 # Build model
 model = Sequential()
-model.add(Dense(35, input_dim=features, activation='sigmoid'))
-model.add(Dense(50, activation='sigmoid'))
-model.add(Dense(50, activation='sigmoid'))
-model.add(Dense(25, activation='sigmoid'))
+model.add(Dense(500, input_dim=features, activation='sigmoid'))
+model.add(Dense(300, activation='sigmoid'))
 model.add(Dense(8))
 
 opt = tf.keras.optimizers.Adam(learning_rate=0.001)
