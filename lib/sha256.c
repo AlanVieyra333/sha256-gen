@@ -49,9 +49,14 @@ void print_vars(uint32_t W[16], uint32_t state[8]) {
   for (size_t i = 0; i < 16; i++) {
     printf("%u,", W[i]);
   }
+
   for (size_t i = 0; i < 8; i++) {
     printf("%u,", state[i]);
   }
+
+  // for (size_t i = 0; i < 64; i++) {
+  //   printf("%u,", K256[i]);
+  // }
 }
 
 void print_st(uint32_t state[8]) {

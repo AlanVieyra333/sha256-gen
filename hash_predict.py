@@ -22,7 +22,7 @@ import sys
 
 tf.random.set_seed(9950866220)
 
-# Input 24 features, output 8 targets
+# Input 88 features, output 8 targets
 data = np.genfromtxt('data.csv', delimiter=',')
 features = 24
 scaled_data = data / 4294967295  # 2^32 - 1
@@ -39,8 +39,7 @@ y_test = y[training_data_len:]
 
 # Build model
 model = Sequential()
-model.add(Dense(500, input_dim=features, activation='sigmoid'))
-model.add(Dense(300, activation='sigmoid'))
+model.add(Dense(476, input_dim=features, activation='sigmoid'))
 model.add(Dense(8))
 
 opt = tf.keras.optimizers.Adam(learning_rate=0.001)
@@ -50,7 +49,7 @@ model.compile(optimizer=opt, loss='mean_squared_error',
               metrics=['accuracy'])
 
 # Train the model
-model.fit(x_train, y_train, batch_size=1, epochs=100)
+model.fit(x_train, y_train, batch_size=1, epochs=30)
 
 y_pred = model.predict(x_test)
 # print(y_pred)

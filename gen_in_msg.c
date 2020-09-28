@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "utils.h"
+
 #define N 1
 
 void gen_msg(uint8_t msg[64]) {
@@ -23,7 +25,7 @@ void gen_msgs() {
 }
 
 int main(int argc, char* argv[]) {
-  srand(time(NULL));
+  srand(get_timestamp().tv_usec);
 
   gen_msgs();
 
