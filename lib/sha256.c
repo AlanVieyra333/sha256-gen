@@ -60,8 +60,9 @@ void print_vars(uint32_t W[16], uint32_t state[8]) {
 }
 
 void print_st(uint32_t state[8]) {
+  printf("State:\n");
   for (size_t i = 0; i < 8; i++) {
-    printf("%u", state[i]);
+    printf("%x", state[i]);
 
     if (i < 7) {
       printf(",");
@@ -96,7 +97,7 @@ void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
       data += 4;
     }
 
-    print_vars(W, state);
+    // print_vars(W, state);
 
     // Depends of vars (4 bytes): a, b, c, d, e, f, g, h, W, K256
     for (i = 0; i < 64; i++) {
@@ -114,6 +115,8 @@ void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
       // printf(",%u,%u,%u,%u,%u,%u,%u,%u\n", a, b, c, d, e, f, g, h);
     }
 
+    printf("\n########## ROUND: %ld\n", blocks);
+    print_st(state);
     state[0] += a;
     state[1] += b;
     state[2] += c;
@@ -122,8 +125,14 @@ void sha256_process(uint32_t state[8], const uint8_t data[], uint32_t length) {
     state[5] += f;
     state[6] += g;
     state[7] += h;
-
     print_st(state);
+
+    // NOTE:
+    // c = A + b
+    // E = c + d
+    // then
+    // E = A + b + d
+    // E - A = b + d
   }
 }
 

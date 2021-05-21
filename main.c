@@ -27,7 +27,7 @@ void hash_msg(uint8_t message[128], uint8_t hash[32]) {
   }
 }
 
-void test(const char message[64]) {
+void decompress(const char message[64]) {
   uint8_t msg_padded[128];
   uint8_t hash_result[32];
 
@@ -36,19 +36,19 @@ void test(const char message[64]) {
 
   hash_msg(msg_padded, hash_result);
 
-  // printf("SHA256 hash:\n%s\n", bytes_to_hex(hash_result, 32));
+  printf("\nSHA256 hash:\n%s\n", bytes_to_hex(hash_result, 32));
 }
 
 int main(int argc, char* argv[]) {
   if (argc != 2) {
     fprintf(
         stderr,
-        "Example: ./sha256 "
+        "Example: ./sha256_decompress "
         "50aa1d9bfd848b6560edcdb0a95ee3fa0ff36b8cb6cdc6a5ee0dfdc41087dc56\n");
     return 1;
   }
 
-  test(argv[1]);
+  decompress(argv[1]);
 
   return 0;
 }
