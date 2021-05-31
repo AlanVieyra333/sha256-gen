@@ -16,12 +16,12 @@ void hex_to_bytes(const char* hex_str, uint8_t bytes[]) {
   int len = strlen(hex_str);
 
   for (int i = 0; i < len / 2; i++) {
-    sscanf(&hex_str[2 * i], "%02x", (unsigned int *) &bytes[i]);
+    sscanf(&hex_str[2 * i], "%02x", (unsigned int*)&bytes[i]);
   }
 }
 
 char* bytes_to_hex(uint8_t bytes[], size_t len) {
-  char* hex = (char*)malloc(sizeof(char) * (2 * len + 1));
+  char* hex = (char*)malloc(sizeof(char) * (2 * len + 1)); // Two characters for every hex + a space for the end string.
 
   for (int i = 0; i < len; i++) {
     sprintf(&hex[2 * i], "%02x", bytes[i]);
